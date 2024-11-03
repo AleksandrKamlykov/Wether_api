@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #weatherResult {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather App</h1>
+    <input type="text" id="cityInput" placeholder="Enter city name" />
+    <button onclick="getWeather()">Get Weather</button>
+    <button onclick="getAllCitiesWeather()">Get All Cities Weather</button>
+    <div id="weatherResult"></div>
+
+    <script>
+        function getWeather() {
+            const city = document.getElementById('cityInput').value;
+
+            fetch(`/WeatherForecast/${city}`)
+                .then(response => {
+                    if (response.status === 404) {
+                        throw new Error('City not found');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('weatherResult').innerHTML = `
+                            <strong>Weather in ${city}:</strong><br>
+                            Temperature: ${data.temperature}°C<br>
+                            Humidity: ${data.humidity}%<br>
+                            Description: ${data.description}
+                        `;
+                })
+                .catch(error => {
+                    document.getElementById('weatherResult').innerHTML = `<strong>Error:</strong> ${error.message}`;
+                });
+        }
+
+        function getAllCitiesWeather() {
+
+            fetch('/WeatherForecast')
+                .then(response => response.json())
+                .then(data => {
+                    let result = '<strong>Weather in all cities:</strong><br>';
+                    data.forEach(cityWeather => {
+                        result += `
+                                <strong>City: ${cityWeather.city}</strong><br>
+                                Temperature: ${cityWeather.temperature}°C<br>
+                                Humidity: ${cityWeather.humidity}%<br>
+                                Description: ${cityWeather.description}<br><br>
+                            `;
+                    });
+                    document.getElementById('weatherResult').innerHTML = result;
+                })
+                .catch(error => {
+                    document.getElementById('weatherResult').innerHTML = `<strong>Error:</strong> ${error.message}`;
+                });
+        }
+    </script>
+</body>
+</html>
+
+
